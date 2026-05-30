@@ -13,11 +13,16 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly JwtService _jwtService;
+    private readonly PasswordService _passwordService;
 
-    public AuthController(AppDbContext context, JwtService jwtService)
+    public AuthController(
+        AppDbContext context,
+        JwtService jwtService,
+        PasswordService passwordService)
     {
         _context = context;
         _jwtService = jwtService;
+        _passwordService = passwordService;
     }
 
     [HttpPost("register")]
@@ -38,7 +43,7 @@ public class AuthController : ControllerBase
         {
             FullName = request.FullName,
             Email = request.Email,
-            PasswordHash = request.Password,
+            PasswordHash = _passwordService.HashPassword(request.Password),
             Role = "Student",
             CreatedAt = DateTime.UtcNow
         };
@@ -66,11 +71,21 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(u =>
-                u.Email == request.Email &&
-                u.PasswordHash == request.Password);
+            .FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (user == null)
+        {
+            return Unauthorized(new
+            {
+                message = "E-Mail oder Passwort ist falsch."
+            });
+        }
+
+        var passwordIsValid = _passwordService.VerifyPassword(
+            request.Password,
+            user.PasswordHash);
+
+        if (!passwordIsValid)
         {
             return Unauthorized(new
             {

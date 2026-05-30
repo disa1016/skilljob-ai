@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // JWT Service registrieren
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<PasswordService>();
 
 // JWT Einstellungen laden
 var jwtKey = builder.Configuration["Jwt:Key"]!;
