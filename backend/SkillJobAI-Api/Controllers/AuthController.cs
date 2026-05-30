@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SkillJobAI.Api.Data;
 using SkillJobAI.Api.Entities;
 using SkillJobAI.Api.Models;
+using SkillJobAI.Api.Services;
 
 namespace SkillJobAI.Api.Controllers;
 
@@ -11,10 +12,12 @@ namespace SkillJobAI.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly JwtService _jwtService;
 
-    public AuthController(AppDbContext context)
+    public AuthController(AppDbContext context, JwtService jwtService)
     {
         _context = context;
+        _jwtService = jwtService;
     }
 
     [HttpPost("register")]
@@ -43,9 +46,12 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
+        var token = _jwtService.GenerateToken(user);
+
         return Ok(new
         {
             message = "User registered successfully",
+            token,
             user = new
             {
                 id = user.Id,
@@ -72,10 +78,12 @@ public class AuthController : ControllerBase
             });
         }
 
+        var token = _jwtService.GenerateToken(user);
+
         return Ok(new
         {
             message = "Login successful",
-            token = "fake-jwt-token-for-testing",
+            token,
             user = new
             {
                 id = user.Id,
