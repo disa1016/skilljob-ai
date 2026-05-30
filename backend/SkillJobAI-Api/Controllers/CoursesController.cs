@@ -38,7 +38,7 @@ public class CoursesController : ControllerBase
     }
 
     // Kurs erstellen - nur eingeloggte Benutzer
-    [Authorize]
+    [Authorize(Roles = "Instructor")]
     [HttpPost]
     public async Task<IActionResult> CreateCourse(Course course)
     {
@@ -51,7 +51,7 @@ public class CoursesController : ControllerBase
     }
 
     // Kurs löschen - nur eingeloggte Benutzer
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCourse(int id)
     {

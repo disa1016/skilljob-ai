@@ -51,7 +51,7 @@ public class EnrollmentsController : ControllerBase
         return Ok(enrollment);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Student")]
     [HttpGet("my")]
     public async Task<IActionResult> MyEnrollments()
     {
