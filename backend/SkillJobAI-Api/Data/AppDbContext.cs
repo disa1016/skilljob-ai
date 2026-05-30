@@ -13,4 +13,6 @@ public class AppDbContext : DbContext
     public DbSet<AppUser> Users => Set<AppUser>();
 
    public DbSet<Job> Jobs => Set<Job>();
+
+  public DbSet<Application> Applications => Set<Application>(); 
 }
