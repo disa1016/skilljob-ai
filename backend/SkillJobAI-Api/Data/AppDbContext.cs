@@ -12,7 +12,13 @@ public class AppDbContext : DbContext
 
     public DbSet<AppUser> Users => Set<AppUser>();
 
-   public DbSet<Job> Jobs => Set<Job>();
+    public DbSet<Job> Jobs => Set<Job>();
 
-  public DbSet<Application> Applications => Set<Application>(); 
+    public DbSet<Application> Applications => Set<Application>();
+
+    public DbSet<Course> Courses => Set<Course>();
+    public DbSet<Lesson> Lessons => Set<Lesson>();
+    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+
+
 }
