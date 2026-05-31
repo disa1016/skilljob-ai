@@ -50,8 +50,7 @@ public class EnrollmentsController : ControllerBase
 
         return Ok(enrollment);
     }
-
-    [Authorize(Roles = "Student")]
+    [Authorize]
     [HttpGet("my")]
     public async Task<IActionResult> MyEnrollments()
     {
@@ -62,8 +61,29 @@ public class EnrollmentsController : ControllerBase
 
         var enrollments = await _context.Enrollments
             .Where(e => e.UserId == int.Parse(userId))
+            .Select(e => new
+            {
+                id = e.Id,
+                courseId = e.CourseId,
+                enrolledAt = e.EnrolledAt,
+                isCompleted = e.IsCompleted,
+                course = _context.Courses
+                    .Where(c => c.Id == e.CourseId)
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        title = c.Title,
+                        description = c.Description,
+                        category = c.Category,
+                        level = c.Level,
+                        instructor = c.Instructor
+                    })
+                    .FirstOrDefault()
+            })
             .ToListAsync();
 
         return Ok(enrollments);
     }
+
+
 }

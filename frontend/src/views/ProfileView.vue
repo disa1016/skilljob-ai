@@ -54,78 +54,95 @@ onMounted(async () => {
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>Meine Bewerbungen</h5>
-                        <p class="display-6">{{ applications.length }}</p>
-                    </div>
-                </div>
-            </div>
+   <div class="row">
+  <!-- Bewerbungen -->
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5>Meine Bewerbungen</h5>
 
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>Meine Kurse</h5>
-                        <p class="display-6">{{ enrollments.length }}</p>
-                    </div>
-                </div>
-            </div>
+        <p class="display-6">
+          {{ applications.length }}
+        </p>
 
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>Abgeschlossene Lektionen</h5>
-                        <p class="display-6">{{ progress.length }}</p>
-                    </div>
-                </div>
+        <ul
+          v-if="applications.length > 0"
+          class="list-group"
+        >
+          <li
+            v-for="application in applications"
+            :key="application.id"
+            class="list-group-item"
+          >
+            <strong>{{ application.job?.title }}</strong><br />
+            Firma: {{ application.job?.company }}<br />
+            Status: {{ application.status }}
+          </li>
+        </ul>
+
+        <p
+          v-else
+          class="text-muted"
+        >
+          Noch keine Bewerbungen vorhanden.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kurse -->
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5>Meine Kurse</h5>
+
+        <p class="display-6">
+          {{ enrollments.length }}
+        </p>
+
+        <ul
+          v-if="enrollments.length > 0"
+          class="list-group"
+        >
+          <li
+            v-for="enrollment in enrollments"
+            :key="enrollment.id"
+            class="list-group-item"
+          >
+            <strong>{{ enrollment.course?.title }}</strong><br />
+            Level: {{ enrollment.course?.level }}<br />
+            Kategorie: {{ enrollment.course?.category }}
+          </li>
+        </ul>
+
+        <p
+          v-else
+          class="text-muted"
+        >
+          Du bist noch in keinem Kurs eingeschrieben.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        <!-- Progress Details -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5>Abgeschlossene Lektionen</h5>
+
+                <ul class="list-group">
+                    <li v-for="item in progress" :key="item.id" class="list-group-item">
+                        Lesson ID: {{ item.lessonId }} -
+                        abgeschlossen am {{ new Date(item.completedAt).toLocaleString() }}
+                    </li>
+                </ul>
+
+                <p v-if="progress.length === 0" class="text-muted mt-3">
+                    Noch keine Lektionen abgeschlossen.
+                </p>
             </div>
         </div>
-
-        <!-- Meine Bewerbungen -->
-<div class="card shadow-sm mt-4">
-  <div class="card-body">
-    <h5>Meine Bewerbungen</h5>
-
-    <ul class="list-group">
-      <li
-        v-for="application in applications"
-        :key="application.id"
-        class="list-group-item"
-      >
-        <strong>{{ application.job?.title }}</strong><br />
-        Firma: {{ application.job?.company }}<br />
-        Status: {{ application.status }}
-      </li>
-    </ul>
-
-    <p v-if="applications.length === 0" class="text-muted mt-3">
-      Noch keine Bewerbungen vorhanden.
-    </p>
-  </div>
-</div>
-
-<!-- Progress Details -->
-<div class="card shadow-sm mt-4">
-  <div class="card-body">
-    <h5>Abgeschlossene Lektionen</h5>
-
-    <ul class="list-group">
-      <li
-        v-for="item in progress"
-        :key="item.id"
-        class="list-group-item"
-      >
-        Lesson ID: {{ item.lessonId }} -
-        abgeschlossen am {{ new Date(item.completedAt).toLocaleString() }}
-      </li>
-    </ul>
-
-    <p v-if="progress.length === 0" class="text-muted mt-3">
-      Noch keine Lektionen abgeschlossen.
-    </p>
-  </div>
-</div>
     </div>
 </template>
