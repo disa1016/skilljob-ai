@@ -8,6 +8,7 @@ import JobsView from "@/views/JobsView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 
 import CourseDetailsView from "@/views/CourseDetailsView.vue";
+import JobDetailsView from "@/views/JobDetailsView.vue";
 const routes = [
   {
     path: "/",
@@ -35,9 +36,13 @@ const routes = [
     component: ProfileView,
   },
   {
-  path: "/courses/:id",
-  component: CourseDetailsView,
-},
+    path: "/courses/:id",
+    component: CourseDetailsView,
+  },
+  {
+    path: "/jobs/:id",
+    component: JobDetailsView,
+  }
 ];
 
 const router = createRouter({
