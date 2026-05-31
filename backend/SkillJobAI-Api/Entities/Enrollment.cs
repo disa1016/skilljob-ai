@@ -11,4 +11,8 @@ public class Enrollment
     public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
 
     public bool IsCompleted { get; set; } = false;
+
+    public AppUser? User { get; set; }
+
+    public Course? Course { get; set; }
 }

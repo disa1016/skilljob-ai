@@ -15,4 +15,8 @@ public class Course
     public string Instructor { get; set; } = "";
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public List<Lesson> Lessons { get; set; } = new();
+
+    public List<Enrollment> Enrollments { get; set; } = new();
 }

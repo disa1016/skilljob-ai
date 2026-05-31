@@ -15,4 +15,6 @@ public class Lesson
     public int OrderNumber { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public Course? Course { get; set; }
 }

@@ -20,5 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<Lesson> Lessons => Set<Lesson>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
+    public DbSet<LessonProgress> LessonProgresses => Set<LessonProgress>();
+
 
 }
