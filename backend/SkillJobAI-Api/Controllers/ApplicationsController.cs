@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,6 +51,25 @@ public class ApplicationsController : ControllerBase
 
         var applications = await _context.Applications
             .Where(a => a.UserId == int.Parse(userId))
+            .Select(a => new
+            {
+                id = a.Id,
+                jobId = a.JobId,
+                coverLetter = a.CoverLetter,
+                status = a.Status,
+                createdAt = a.CreatedAt,
+                job = _context.Jobs
+                    .Where(j => j.Id == a.JobId)
+                    .Select(j => new
+                    {
+                        id = j.Id,
+                        title = j.Title,
+                        company = j.Company,
+                        location = j.Location,
+                        salary = j.Salary
+                    })
+                    .FirstOrDefault()
+            })
             .ToListAsync();
 
         return Ok(applications);

@@ -9,6 +9,7 @@ import ProfileView from "@/views/ProfileView.vue";
 
 import CourseDetailsView from "@/views/CourseDetailsView.vue";
 import JobDetailsView from "@/views/JobDetailsView.vue";
+
 const routes = [
   {
     path: "/",

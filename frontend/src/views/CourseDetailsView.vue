@@ -12,6 +12,23 @@ const loading = ref(true);
 const error = ref("");
 const success = ref("");
 
+const enroll = async () => {
+    error.value = "";
+    success.value = "";
+
+    try {
+        await api.post("/enrollments", {
+            courseId: course.value.id,
+        });
+        success.value = "Du wurdest erfolgreich in den Kurs eingeschrieben.";
+    } catch (err) {
+        if (err.response?.data?.message) {
+            error.value = err.response.data.message;
+        } else {
+            error.value = "Einschreibung konnte nicht durchgeführt werden.";
+        }
+    }
+};
 const loadCourse = async () => {
     const response = await api.get(`/courses/${route.params.id}`);
     course.value = response.data;
@@ -80,6 +97,10 @@ onMounted(async () => {
                 <span class="badge bg-primary me-2">{{ course.level }}</span>
                 <span class="badge bg-secondary">{{ course.category }}</span>
             </div>
+
+            <button class="btn btn-primary mb-4" @click="enroll">
+                In Kurs einschreiben
+            </button>
 
             <h3 class="mt-4">Lessons</h3>
 
