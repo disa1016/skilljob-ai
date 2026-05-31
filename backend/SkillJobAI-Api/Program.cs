@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SkillJobAI.Api.Data;
@@ -19,6 +20,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // JWT Service registrieren
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<PasswordService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // JWT Einstellungen laden
 var jwtKey = builder.Configuration["Jwt:Key"]!;
@@ -85,6 +96,10 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
+// CORS aktivieren, damit Vue Frontend auf Backend zugreifen darf
+app.UseCors("AllowVueFrontend");
+
+// JWT aktivieren
 app.UseAuthentication();
 app.UseAuthorization();
 
