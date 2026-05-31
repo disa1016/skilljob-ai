@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SkillJobAI_Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddLessonProgressesTable : Migration
+    public partial class FixLessonProgressModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -12,8 +12,8 @@ using SkillJobAI.Api.Data;
 namespace SkillJobAI_Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260531104517_AddLessonProgressesTable")]
-    partial class AddLessonProgressesTable
+    [Migration("20260531105623_FixLessonProgressModel")]
+    partial class FixLessonProgressModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
