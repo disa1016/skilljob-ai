@@ -57,6 +57,14 @@ const login = async () => {
             <button class="btn btn-primary w-100" @click="login" :disabled="loading">
                 {{ loading ? "Bitte warten..." : "Login" }}
             </button>
+            <p class="text-center mt-3 mb-0">Noch kein Konto?
+                <router-link to="/register">Registrieren</router-link>
+            </p>
+            <p class="text-center mt-3">
+  <router-link to="/forgot-password">
+    Passwort vergessen?
+  </router-link>
+</p>
         </div>
     </div>
 </template>

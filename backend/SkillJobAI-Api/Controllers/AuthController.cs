@@ -108,4 +108,28 @@ public class AuthController : ControllerBase
             }
         });
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if (user == null)
+        {
+            return NotFound(new
+            {
+                message = "Benutzer mit dieser E-Mail wurde nicht gefunden."
+            });
+        }
+
+        user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Passwort wurde erfolgreich geändert."
+        });
+    }
 }
