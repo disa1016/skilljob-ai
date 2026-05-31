@@ -1,7 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillJobAI.Api.Data;
+using UglyToad.PdfPig;
 
 namespace SkillJobAI.Api.Controllers;
 
@@ -20,52 +22,57 @@ public class AiController : ControllerBase
     [HttpPost("analyze-cv")]
     public IActionResult AnalyzeCv(AnalyzeCvRequest request)
     {
-        var text = request.CvText.ToLower();
+        return Ok(AnalyzeCvText(request.CvText));
+    }
 
-        var skills = new List<string>();
+    [Authorize]
+    [HttpPost("analyze-cv-pdf")]
+    public async Task<IActionResult> AnalyzeCvPdf(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new
+            {
+                message = "Bitte lade eine PDF-Datei hoch."
+            });
+        }
 
-        if (text.Contains("c#") || text.Contains("csharp"))
-            skills.Add("C#");
+        if (!file.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                message = "Nur PDF-Dateien sind erlaubt."
+            });
+        }
 
-        if (text.Contains("asp.net") || text.Contains(".net"))
-            skills.Add("ASP.NET Core");
+        var cvText = new StringBuilder();
 
-        if (text.Contains("vue"))
-            skills.Add("Vue.js");
+        await using var stream = file.OpenReadStream();
 
-        if (text.Contains("javascript"))
-            skills.Add("JavaScript");
+        using var document = PdfDocument.Open(stream);
 
-        if (text.Contains("sql") || text.Contains("postgresql"))
-            skills.Add("SQL / PostgreSQL");
+        foreach (var page in document.GetPages())
+        {
+            cvText.AppendLine(page.Text);
+        }
 
-        if (text.Contains("git") || text.Contains("github"))
-            skills.Add("Git / GitHub");
+        if (string.IsNullOrWhiteSpace(cvText.ToString()))
+        {
+            return BadRequest(new
+            {
+                message = "Aus dieser PDF konnte kein Text gelesen werden."
+            });
+        }
 
-        var score = Math.Min(100, skills.Count * 15);
-
-        var suggestions = new List<string>();
-
-        if (!skills.Contains("C#"))
-            suggestions.Add("Füge C# Kenntnisse hinzu.");
-
-        if (!skills.Contains("ASP.NET Core"))
-            suggestions.Add("Erwähne ASP.NET Core oder Backend-Erfahrung.");
-
-        if (!skills.Contains("Vue.js"))
-            suggestions.Add("Erwähne Vue.js oder Frontend-Projekte.");
-
-        if (!skills.Contains("Git / GitHub"))
-            suggestions.Add("Erwähne GitHub-Projekte oder Versionskontrolle.");
-
-        if (suggestions.Count == 0)
-            suggestions.Add("Dein Lebenslauf enthält bereits gute technische Skills.");
+        var result = AnalyzeCvText(cvText.ToString());
 
         return Ok(new
         {
-            score,
-            skills,
-            suggestions
+            fileName = file.FileName,
+            extractedText = cvText.ToString(),
+            result.Score,
+            result.Skills,
+            result.Suggestions
         });
     }
 
@@ -122,6 +129,57 @@ public class AiController : ControllerBase
             .ToList();
 
         return Ok(recommendations);
+    }
+
+    private static AnalyzeCvResult AnalyzeCvText(string cvText)
+    {
+        var text = cvText.ToLower();
+
+        var skills = new List<string>();
+
+        if (text.Contains("c#") || text.Contains("csharp"))
+            skills.Add("C#");
+
+        if (text.Contains("asp.net") || text.Contains(".net"))
+            skills.Add("ASP.NET Core");
+
+        if (text.Contains("vue"))
+            skills.Add("Vue.js");
+
+        if (text.Contains("javascript"))
+            skills.Add("JavaScript");
+
+        if (text.Contains("sql") || text.Contains("postgresql"))
+            skills.Add("SQL / PostgreSQL");
+
+        if (text.Contains("git") || text.Contains("github"))
+            skills.Add("Git / GitHub");
+
+        var score = Math.Min(100, skills.Count * 15);
+
+        var suggestions = new List<string>();
+
+        if (!skills.Contains("C#"))
+            suggestions.Add("Füge C# Kenntnisse hinzu.");
+
+        if (!skills.Contains("ASP.NET Core"))
+            suggestions.Add("Erwähne ASP.NET Core oder Backend-Erfahrung.");
+
+        if (!skills.Contains("Vue.js"))
+            suggestions.Add("Erwähne Vue.js oder Frontend-Projekte.");
+
+        if (!skills.Contains("Git / GitHub"))
+            suggestions.Add("Erwähne GitHub-Projekte oder Versionskontrolle.");
+
+        if (suggestions.Count == 0)
+            suggestions.Add("Dein Lebenslauf enthält bereits gute technische Skills.");
+
+        return new AnalyzeCvResult
+        {
+            Score = score,
+            Skills = skills,
+            Suggestions = suggestions
+        };
     }
 
     private static JobMatchResult CalculateJobMatch(
@@ -191,6 +249,15 @@ public class AiController : ControllerBase
 public class AnalyzeCvRequest
 {
     public string CvText { get; set; } = "";
+}
+
+public class AnalyzeCvResult
+{
+    public int Score { get; set; }
+
+    public List<string> Skills { get; set; } = new();
+
+    public List<string> Suggestions { get; set; } = new();
 }
 
 public class JobMatchRequest
