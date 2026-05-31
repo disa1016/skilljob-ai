@@ -52,6 +52,7 @@ const analyzePdf = async () => {
         result.value = {
             score: response.data.score,
             skills: response.data.skills,
+            skillCategories: response.data.skillCategories,
             suggestions: response.data.suggestions,
         };
 
@@ -117,13 +118,57 @@ const analyzePdf = async () => {
                     Score: {{ result.score }}/100
                 </p>
 
-                <h5>Gefundene Skills</h5>
+                <h5>Skill Kategorien</h5>
+
+                <div class="row mb-4">
+                    <div v-for="category in result.skillCategories" :key="category.name" class="col-md-6 mb-3">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body">
+                                <h6 class="fw-bold">
+                                    {{ category.name }}
+                                </h6>
+
+                                <div class="mb-2">
+                                    <strong>Gefunden</strong>
+
+                                    <ul class="list-group mt-2">
+                                        <li v-for="skill in category.matchedSkills" :key="skill"
+                                            class="list-group-item list-group-item-success">
+                                            {{ skill }}
+                                        </li>
+                                    </ul>
+
+                                    <p v-if="category.matchedSkills.length === 0" class="text-muted mt-2">
+                                        Keine Skills gefunden.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <strong>Fehlt noch</strong>
+
+                                    <ul class="list-group mt-2">
+                                        <li v-for="skill in category.missingSkills" :key="skill"
+                                            class="list-group-item list-group-item-warning">
+                                            {{ skill }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5>Alle gefundenen Skills</h5>
 
                 <ul class="list-group mb-3">
                     <li v-for="skill in result.skills" :key="skill" class="list-group-item">
                         {{ skill }}
                     </li>
                 </ul>
+
+                <p v-if="result.skills.length === 0" class="text-muted">
+                    Keine technischen Skills erkannt.
+                </p>
 
                 <h5>Empfehlungen</h5>
 

@@ -72,6 +72,7 @@ public class AiController : ControllerBase
             extractedText = cvText.ToString(),
             result.Score,
             result.Skills,
+            result.SkillCategories,
             result.Suggestions
         });
     }
@@ -135,50 +136,149 @@ public class AiController : ControllerBase
     {
         var text = cvText.ToLower();
 
-        var skills = new List<string>();
+        var skillCategories = new List<SkillCategoryResult>
+        {
+            AnalyzeCategory(text, "Backend", new List<string>
+            {
+                "C#",
+                "ASP.NET Core",
+                ".NET",
+                "Node.js",
+                "REST API",
+                "Microservices"
+            }),
 
-        if (text.Contains("c#") || text.Contains("csharp"))
-            skills.Add("C#");
+            AnalyzeCategory(text, "Frontend", new List<string>
+            {
+                "Vue.js",
+                "React",
+                "Angular",
+                "JavaScript",
+                "TypeScript",
+                "HTML",
+                "CSS",
+                "Bootstrap"
+            }),
 
-        if (text.Contains("asp.net") || text.Contains(".net"))
-            skills.Add("ASP.NET Core");
+            AnalyzeCategory(text, "Database", new List<string>
+            {
+                "SQL",
+                "PostgreSQL",
+                "MySQL",
+                "MongoDB",
+                "Entity Framework"
+            }),
 
-        if (text.Contains("vue"))
-            skills.Add("Vue.js");
+            AnalyzeCategory(text, "DevOps", new List<string>
+            {
+                "Git",
+                "GitHub",
+                "Docker",
+                "Kubernetes",
+                "CI/CD",
+                "Linux"
+            }),
 
-        if (text.Contains("javascript"))
-            skills.Add("JavaScript");
+            AnalyzeCategory(text, "Cloud", new List<string>
+            {
+                "Azure",
+                "AWS",
+                "Google Cloud"
+            })
+        };
 
-        if (text.Contains("sql") || text.Contains("postgresql"))
-            skills.Add("SQL / PostgreSQL");
+        var skills = skillCategories
+            .SelectMany(c => c.MatchedSkills)
+            .Distinct()
+            .ToList();
 
-        if (text.Contains("git") || text.Contains("github"))
-            skills.Add("Git / GitHub");
+        var totalSkills = skillCategories
+            .Sum(c => c.MatchedSkills.Count + c.MissingSkills.Count);
 
-        var score = Math.Min(100, skills.Count * 15);
+        var matchedSkillsCount = skillCategories
+            .Sum(c => c.MatchedSkills.Count);
+
+        var score = totalSkills == 0
+            ? 0
+            : (int)Math.Round((double)matchedSkillsCount / totalSkills * 100);
 
         var suggestions = new List<string>();
 
-        if (!skills.Contains("C#"))
-            suggestions.Add("Füge C# Kenntnisse hinzu.");
+        foreach (var category in skillCategories)
+        {
+            if (category.MatchedSkills.Count == 0)
+            {
+                suggestions.Add(
+                    $"Ergänze Kenntnisse im Bereich {category.Name}, z.B. {string.Join(", ", category.MissingSkills.Take(3))}.");
+            }
+            else if (category.MissingSkills.Count > 0)
+            {
+                suggestions.Add(
+                    $"Im Bereich {category.Name} kannst du noch {string.Join(", ", category.MissingSkills.Take(3))} ergänzen.");
+            }
+        }
 
-        if (!skills.Contains("ASP.NET Core"))
-            suggestions.Add("Erwähne ASP.NET Core oder Backend-Erfahrung.");
+        if (!text.Contains("github"))
+            suggestions.Add("Füge einen GitHub-Link oder Projekt-Repositorys hinzu.");
 
-        if (!skills.Contains("Vue.js"))
-            suggestions.Add("Erwähne Vue.js oder Frontend-Projekte.");
+        if (!text.Contains("linkedin"))
+            suggestions.Add("Füge dein LinkedIn-Profil hinzu.");
 
-        if (!skills.Contains("Git / GitHub"))
-            suggestions.Add("Erwähne GitHub-Projekte oder Versionskontrolle.");
+        if (!text.Contains("projekt") && !text.Contains("project"))
+            suggestions.Add("Beschreibe konkrete Projekte mit Technologien und Ergebnissen.");
 
         if (suggestions.Count == 0)
-            suggestions.Add("Dein Lebenslauf enthält bereits gute technische Skills.");
+            suggestions.Add("Dein Lebenslauf enthält bereits viele relevante technische Informationen.");
 
         return new AnalyzeCvResult
         {
             Score = score,
             Skills = skills,
+            SkillCategories = skillCategories,
             Suggestions = suggestions
+        };
+    }
+
+    private static SkillCategoryResult AnalyzeCategory(
+        string text,
+        string categoryName,
+        List<string> skills)
+    {
+        var matchedSkills = new List<string>();
+        var missingSkills = new List<string>();
+
+        foreach (var skill in skills)
+        {
+            if (ContainsSkill(text, skill))
+                matchedSkills.Add(skill);
+            else
+                missingSkills.Add(skill);
+        }
+
+        return new SkillCategoryResult
+        {
+            Name = categoryName,
+            MatchedSkills = matchedSkills,
+            MissingSkills = missingSkills
+        };
+    }
+
+    private static bool ContainsSkill(string text, string skill)
+    {
+        var normalizedSkill = skill.ToLower();
+
+        return normalizedSkill switch
+        {
+            "c#" => text.Contains("c#") || text.Contains("csharp"),
+            "asp.net core" => text.Contains("asp.net") || text.Contains("asp net"),
+            ".net" => text.Contains(".net") || text.Contains("dotnet"),
+            "vue.js" => text.Contains("vue") || text.Contains("vue.js"),
+            "node.js" => text.Contains("node") || text.Contains("node.js"),
+            "rest api" => text.Contains("rest") || text.Contains("api"),
+            "entity framework" => text.Contains("entity framework") || text.Contains("ef core"),
+            "ci/cd" => text.Contains("ci/cd") || text.Contains("pipeline"),
+            "google cloud" => text.Contains("google cloud") || text.Contains("gcp"),
+            _ => text.Contains(normalizedSkill)
         };
     }
 
@@ -257,7 +357,18 @@ public class AnalyzeCvResult
 
     public List<string> Skills { get; set; } = new();
 
+    public List<SkillCategoryResult> SkillCategories { get; set; } = new();
+
     public List<string> Suggestions { get; set; } = new();
+}
+
+public class SkillCategoryResult
+{
+    public string Name { get; set; } = "";
+
+    public List<string> MatchedSkills { get; set; } = new();
+
+    public List<string> MissingSkills { get; set; } = new();
 }
 
 public class JobMatchRequest
