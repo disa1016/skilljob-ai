@@ -71,7 +71,7 @@ public class CertificatesController : ControllerBase
             {
                 page.Size(PageSizes.A4.Landscape());
                 page.Margin(50);
-                page.Background(Colors.White);
+                page.PageColor(Colors.White);
                 page.DefaultTextStyle(x => x.FontSize(20));
 
                 page.Content()
