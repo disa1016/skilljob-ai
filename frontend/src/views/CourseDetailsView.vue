@@ -68,7 +68,7 @@ onMounted(async () => {
         await loadCourse();
         await loadProgress();
     } catch {
-        error.value = "Kurs konnte nicht geladen werden.";
+        error.value = "Daten konnten nicht vollständig geladen werden.";
     } finally {
         loading.value = false;
     }
