@@ -344,6 +344,42 @@ public class AiController : ControllerBase
                 ? "Guter Anfang. Ergänze noch fehlende Skills."
                 : "Der Match ist noch niedrig. Verbessere deinen Lebenslauf gezielt.";
     }
+[Authorize]
+[HttpPost("generate-cover-letter")]
+public IActionResult GenerateCoverLetter(CoverLetterRequest request)
+{
+    var letter = $@"
+Sehr geehrte Damen und Herren,
+
+mit großem Interesse habe ich Ihre Stellenausschreibung gelesen.
+
+Aufgrund meiner Kenntnisse und Erfahrungen bin ich überzeugt,
+einen wertvollen Beitrag zu Ihrem Unternehmen leisten zu können.
+
+Mein Profil:
+{request.CvSummary}
+
+Besonders interessiert mich die Position als:
+
+{request.JobTitle}
+
+bei
+
+{request.Company}.
+
+Ich freue mich darauf, meine Fähigkeiten in Ihrem Team einzubringen
+und mich persönlich bei Ihnen vorzustellen.
+
+Mit freundlichen Grüßen
+
+{request.FullName}
+";
+
+    return Ok(new
+    {
+        coverLetter = letter.Trim()
+    });
+}
 }
 
 public class AnalyzeCvRequest
@@ -389,4 +425,15 @@ public class JobMatchResult
     public List<string> MatchedSkills { get; set; } = new();
 
     public List<string> MissingSkills { get; set; } = new();
+}
+
+public class CoverLetterRequest
+{
+    public string FullName { get; set; } = "";
+
+    public string Company { get; set; } = "";
+
+    public string JobTitle { get; set; } = "";
+
+    public string CvSummary { get; set; } = "";
 }

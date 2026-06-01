@@ -25,6 +25,7 @@ const logout = () => {
                 <router-link class="nav-link" to="/ai/cv-analyzer">AI Analyzer</router-link>
                 <router-link class="nav-link" to="/ai/job-match">Job Matcher</router-link>
                 <router-link class="nav-link" to="/ai/job-recommendations">Job Recommendations</router-link>
+                <router-link class="nav-link" to="/ai/cover-letter">Cover Letter</router-link>
 
                 <button class="btn btn-light btn-sm ms-3" @click="logout">
                     Logout

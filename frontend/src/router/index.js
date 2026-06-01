@@ -10,12 +10,14 @@ import CvAnalyzerView from "@/views/CvAnalyzerView.vue";
 import CoursesView from "@/views/CoursesView.vue";
 import JobsView from "@/views/JobsView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import CoverLetterView from "@/views/CoverLetterView.vue";
 
 import CourseDetailsView from "@/views/CourseDetailsView.vue";
 import JobDetailsView from "@/views/JobDetailsView.vue";
 
 import JobMatchView from "../views/JobMatchView.vue";
 import JobRecommendationsView from "@/views/JobRecommendationsView.vue";
+
 
 const routes = [
   {
@@ -70,6 +72,10 @@ const routes = [
   {
   path: "/ai/job-recommendations",
   component: JobRecommendationsView,
+},
+{
+  path: "/ai/cover-letter",
+  component: CoverLetterView,
 },
 ];
 
